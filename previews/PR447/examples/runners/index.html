@@ -24,9 +24,8 @@ using FileIO # To load images you also need ImageMagick available to your projec
         set_target!(runner, goal, model)
     end
     return model
-end</code></pre><pre class="documenter-example-output">initialize (generic function with 1 method)</pre><p>The example heightmap we use here is a small region of countryside in Sweden, obtained with the <a href="https://github.com/tangrams/heightmapper">Tangram heightmapper</a>.</p><h2 id="Dynamics"><a class="docs-heading-anchor" href="#Dynamics">Dynamics</a><a id="Dynamics-1"></a><a class="docs-heading-anchor-permalink" href="#Dynamics" title="Permalink"></a></h2><p>With the pathfinder in place, and all our runners having a goal position set, stepping is now trivial.</p><pre><code class="language-julia">agent_step!(agent, model) = move_agent!(agent, model)</code></pre><pre class="documenter-example-output">agent_step! (generic function with 1 method)</pre><h2 id="Let&#39;s-Race"><a class="docs-heading-anchor" href="#Let&#39;s-Race">Let&#39;s Race</a><a id="Let&#39;s-Race-1"></a><a class="docs-heading-anchor-permalink" href="#Let&#39;s-Race" title="Permalink"></a></h2><p>Plotting is simple enough. We just need to use the <a href="../../interact/#InteractiveDynamics.abm_plot"><code>InteractiveDynamics.abm_plot</code></a> for our runners, and display the heightmap for our reference. A better interface to do this is currently a work in progress.</p><pre><code class="language-">using InteractiveDynamics
+end</code></pre><pre class="documenter-example-output">initialize (generic function with 1 method)</pre><p>The example heightmap we use here is a small region of countryside in Sweden, obtained with the <a href="https://github.com/tangrams/heightmapper">Tangram heightmapper</a>.</p><h2 id="Dynamics"><a class="docs-heading-anchor" href="#Dynamics">Dynamics</a><a id="Dynamics-1"></a><a class="docs-heading-anchor-permalink" href="#Dynamics" title="Permalink"></a></h2><p>With the pathfinder in place, and all our runners having a goal position set, stepping is now trivial.</p><pre><code class="language-julia">agent_step!(agent, model) = move_along_path!(agent, model)</code></pre><pre class="documenter-example-output">agent_step! (generic function with 1 method)</pre><h2 id="Let&#39;s-Race"><a class="docs-heading-anchor" href="#Let&#39;s-Race">Let&#39;s Race</a><a id="Let&#39;s-Race-1"></a><a class="docs-heading-anchor-permalink" href="#Let&#39;s-Race" title="Permalink"></a></h2><p>Plotting is simple enough. We just need to use the <a href="../../interact/#InteractiveDynamics.abm_plot"><code>InteractiveDynamics.abm_plot</code></a> for our runners, and display the heightmap for our reference. A better interface to do this is currently a work in progress.</p><pre><code class="language-julia">using InteractiveDynamics
 using GLMakie
-GLMakie.activate!() # hide
 
 # Our sample heightmap
 map_url =
@@ -34,23 +33,23 @@ map_url =
     &quot;JuliaDynamics/master/videos/agents/runners_heightmap.jpg&quot;
 model = initialize(map_url)
 
-f, abmstepper = abm_plot(
-    model;
+function preplot!(ax, model)
+    ax.aspect = DataAspect()
+    hm = heatmap!(ax, heightmap(model); colormap = :terrain)
+    scatter!(ax, model.goal; color = (:red, 50), marker = &#39;x&#39;)
+end
+
+abm_video(
+    &quot;runners.mp4&quot;,
+    model,
+    agent_step!;
     resolution = (700, 700),
+    frames = 410,
+    framerate = 25,
     ac = :black,
     as = 8,
     scatterkwargs = (strokecolor = :white, strokewidth = 2),
-)
-ax = contents(f[1, 1])[1]
-ax.aspect = DataAspect()
-scatter!(ax, model.goal; color = (:red, 50), marker = &#39;x&#39;)
-hm = heatmap!(ax, heightmap(model); colormap = :terrain)
-f[1, 2] = Colorbar(f, hm, width = 30, label = &quot;Elevation&quot;)
-rowsize!(f.layout, 1, ax.scene.px_area[].widths[2]) # Colorbar height = axis height
-
-record(f, &quot;runners.mp4&quot;, 1:410; framerate = 25) do i
-    Agents.step!(abmstepper, model, agent_step!, dummystep, 1)
-end
-nothing # hide</code></pre><video width="auto" controls autoplay loop>
+    static_preplot! = preplot!
+)</code></pre><video width="auto" controls autoplay loop>
 <source src="../runners.mp4" type="video/mp4">
-</video></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../maze/">« Maze Solver</a><a class="docs-footer-nextpage" href="../growing_bacteria/">Bacteria Growth »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 4 March 2021 13:16">Thursday 4 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</video></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../maze/">« Maze Solver</a><a class="docs-footer-nextpage" href="../growing_bacteria/">Bacteria Growth »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Tuesday 9 March 2021 08:23">Tuesday 9 March 2021</span>. Using Julia version 1.5.3.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
