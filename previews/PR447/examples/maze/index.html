@@ -5,7 +5,7 @@
 using FileIO # To load images you also need ImageMagick available to your project</code></pre><p>The <code>Walker</code> agent needs no special property, just the <code>id</code> and <code>position</code> from <a href="../../api/#Agents.@agent"><code>@agent</code></a>.</p><pre><code class="language-julia">@agent Walker GridAgent{2} begin end</code></pre><p>The maze is stored as a simple .bmp image, where each pixel corresponds to a position on the grid. White pixels correspond to walkable regions of the maze.</p><pre><code class="language-julia">function initalize_model(map_url)
     # Load the maze from the image file. White values can be identified by a
     # non-zero red component
-    maze = map(x -&gt; x.r &gt; 0, load(download(map_url)))
+    maze = BitArray(map(x -&gt; x.r &gt; 0, load(download(map_url))))
     # Create a pathfinder by specifying the `walkable` parameter for the pathfinder.
     # Since we are interested in the most direct path to the end, the default
     # [`DirectDistance`](@ref) is appropriate.
@@ -24,15 +24,16 @@ using FileIO # To load images you also need ImageMagick available to your projec
     return model
 end
 
-# Dynamics</code></pre><p>Stepping the agent is a trivial matter of calling <a href="../../api/#Agents.move_along_route!"><code>move_along_route!</code></a> to move it along it&#39;s path to the target.</p><pre><code class="language-julia">agent_step!(agent, model) = move_along_route!(agent, model)</code></pre><pre class="documenter-example-output">agent_step! (generic function with 1 method)</pre><h2 id="Visualization"><a class="docs-heading-anchor" href="#Visualization">Visualization</a><a id="Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Visualization" title="Permalink"></a></h2><p>Visualizing the <code>Walker</code> move through the maze is handled through <a href="../../interact/#InteractiveDynamics.abm_plot"><code>InteractiveDynamics.abm_plot</code></a>.</p><pre><code class="language-">using InteractiveDynamics
+# Dynamics</code></pre><p>Stepping the agent is a trivial matter of calling <a href="../../api/#Agents.move_along_route!"><code>move_along_route!</code></a> to move it along it&#39;s path to the target.</p><pre><code class="language-julia">agent_step!(agent, model) = move_along_route!(agent, model)</code></pre><pre class="documenter-example-output">agent_step! (generic function with 1 method)</pre><h2 id="Visualization"><a class="docs-heading-anchor" href="#Visualization">Visualization</a><a id="Visualization-1"></a><a class="docs-heading-anchor-permalink" href="#Visualization" title="Permalink"></a></h2><p>Visualizing the <code>Walker</code> move through the maze is handled through <a href="../../interact/#InteractiveDynamics.abm_plot"><code>InteractiveDynamics.abm_plot</code></a>.</p><pre><code class="language-julia">using InteractiveDynamics
 using GLMakie
-GLMakie.activate!() # hide
 
 # Our sample walkmap
 map_url =
     &quot;https://raw.githubusercontent.com/JuliaDynamics/&quot; *
     &quot;JuliaDynamics/master/videos/agents/maze.bmp&quot;
-model = initalize_model(map_url)</code></pre><p>The <code>static_preplot!</code> keyword argument allows plotting the maze as a heatmap behind the agent.</p><pre><code class="language-">abm_video(
+model = initalize_model(map_url)</code></pre><pre class="documenter-example-output">AgentBasedModel with 1 agents of type Walker
+ space: GridSpace with size (41, 41), metric=chebyshev, periodic=false, pathfinder=A* in 2 dimensions, orthogonal, ϵ=0.0, metric=DirectDistance
+ scheduler: fastest</pre><p>The <code>static_preplot!</code> keyword argument allows plotting the maze as a heatmap behind the agent.</p><pre><code class="language-julia">abm_video(
     &quot;maze.mp4&quot;,
     model,
     agent_step!;
@@ -43,7 +44,6 @@ model = initalize_model(map_url)</code></pre><p>The <code>static_preplot!</code>
     as=11,
     offset = _ -&gt; (-0.5, -0.5),
     static_preplot! = (ax, _) -&gt; heatmap!(ax, walkmap(model); colormap=:grays)
-)
-nothing # hide</code></pre><video width="auto" controls autoplay loop>
+)</code></pre><video width="auto" controls autoplay loop>
 <source src="../maze.mp4" type="video/mp4">
-</video></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../predator_prey/">« Predator-Prey</a><a class="docs-footer-nextpage" href="../runners/">Mountain Runners »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Wednesday 17 March 2021 09:23">Wednesday 17 March 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+</video></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../predator_prey/">« Predator-Prey</a><a class="docs-footer-nextpage" href="../runners/">Mountain Runners »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> on <span class="colophon-date" title="Thursday 18 March 2021 15:21">Thursday 18 March 2021</span>. Using Julia version 1.5.4.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
